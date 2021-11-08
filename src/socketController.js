@@ -7,11 +7,19 @@ const socketController = (socket) => {
     socket.broadcast.emit(events.newUser, { nickname });
   });
 
-  // 유저가 나갔을 때,
-  // 유저가 나갔음을 알려주는 이벤트 발생
-  // 유저가 나감 : disconnect 이벤트 발생했음
-  // 유저가 나갔음을 알려주는 이벤트
-  // : disconnected를 emit해줘야함
+  socket.on(events.disconnect, () => {
+    socket.broadcast.emit(events.disconnected, { nickname: socket.nickname });
+  });
+
+  // sendMsg 이벤트를 받고, 그 값(채팅)을
+  // 모든 유저에게 전달 (broadcast)하는 이벤트
+  // newMsg 발생
+  socket.on(events.sendMsg, ({ message }) => {
+    socket.broadcast.emit(events.newMsg, {
+      message,
+      nickname: socket.nickname,
+    });
+  });
 };
 
 export default socketController;
